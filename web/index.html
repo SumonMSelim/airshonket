@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>AirShonket — Bangladesh air quality</title>
+    <meta
+      name="description"
+      content="See how bad the air is across Bangladesh right now, where the pollution comes from, and what to do about it today."
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-name">AirShonket</span>
+        <span class="brand-tag">Breathe easy. Know the air.</span>
+      </div>
+      <button id="profile-btn" class="profile-btn" type="button">
+        Set who you are
+      </button>
+    </header>
+
+    <main id="map" aria-label="Map of air quality across Bangladesh"></main>
+
+    <!-- Legend -->
+    <section id="legend" class="legend" aria-label="Air quality legend">
+      <h2 class="legend-title">Air quality (PM2.5 AQI)</h2>
+      <ul class="legend-list" id="legend-list"></ul>
+      <p class="legend-note">
+        Brown dots are known brick kilns mapped in OpenStreetMap. They are the
+        biggest winter source of fine particles.
+      </p>
+    </section>
+
+    <!-- Detail panel: shown when the user taps a place -->
+    <aside id="panel" class="panel panel-hidden" aria-live="polite">
+      <button id="panel-close" class="panel-close" type="button" aria-label="Close">×</button>
+      <div id="panel-body"></div>
+    </aside>
+
+    <!-- Profile chooser -->
+    <div id="profile-modal" class="modal modal-hidden" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+      <div class="modal-card">
+        <h2 id="profile-title">Who is this for?</h2>
+        <p class="modal-sub">Pick what applies. The advice will fit you.</p>
+        <form id="profile-form" class="profile-options"></form>
+        <button id="profile-save" class="primary-btn" type="button">Save</button>
+      </div>
+    </div>
+
+    <footer class="attribution">
+      Air quality: OpenAQ. Kilns: © OpenStreetMap contributors (ODbL).
+    </footer>
+
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

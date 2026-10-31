@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+.cursor/
+
+# Secrets — never commit API keys
+.env
+*.key
+
+# Large or regenerated data (kept out of git; regenerate via pipeline scripts)
+# Note: kilns.geojson is small and useful as a checked-in sample, so it stays.
+data/bd_stations.json
+data/snapshots/
+
+# Node (for the web build, added later)
+node_modules/
+dist/
