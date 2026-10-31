@@ -254,6 +254,40 @@ body {
   box-shadow: var(--shadow);
 }
 
+/* You-are-here marker */
+.you-are-here {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #1a73e8;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.35);
+  cursor: pointer;
+}
+
+/* Toast message for locate feedback */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  z-index: 13;
+  max-width: calc(100vw - 32px);
+  background: rgba(15, 20, 25, 0.92);
+  color: #fff;
+  font-size: 13px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+}
+.toast-show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 /* Profile modal */
 .modal {
   position: fixed;

@@ -252,6 +252,95 @@ function onMapClick(e) {
   openPanelForPoint([e.lngLat.lng, e.lngLat.lat]);
 }
 
+// ---------------------------------------------------------------------------
+// Find my location
+// ---------------------------------------------------------------------------
+
+let youAreHereMarker = null;
+
+/** Check a [lon, lat] point sits within the Bangladesh map bounds. */
+function isInBangladesh([lon, lat]) {
+  const [[w, s], [e, n]] = CONFIG.BD_BOUNDS;
+  return lon >= w && lon <= e && lat >= s && lat <= n;
+}
+
+function locateMe() {
+  const btn = document.getElementById('locate-btn');
+  if (!('geolocation' in navigator)) {
+    flashLocateMessage(t.locateUnavailable);
+    return;
+  }
+
+  const original = btn.textContent;
+  btn.textContent = t.locating;
+  btn.disabled = true;
+
+  const restore = () => {
+    btn.textContent = original;
+    btn.disabled = false;
+  };
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      restore();
+      const point = [pos.coords.longitude, pos.coords.latitude];
+      if (!isInBangladesh(point)) {
+        flashLocateMessage(t.locateOutside);
+        map.flyTo({ center: CONFIG.BD_CENTER, zoom: CONFIG.BD_ZOOM });
+        return;
+      }
+      placeYouAreHere(point);
+      map.flyTo({ center: point, zoom: 10, speed: 1.2 });
+      openPanelForPoint(point, t.youAreHere);
+    },
+    (err) => {
+      restore();
+      flashLocateMessage(
+        err.code === err.PERMISSION_DENIED ? t.locateDenied : t.locateUnavailable
+      );
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+  );
+}
+
+/** Jump to the demo location (Dhaka Airport). Works anywhere, no permission
+ *  needed. Handy for testing and the demo video. */
+function goToDemo() {
+  const { name, point } = CONFIG.DEMO_LOCATION;
+  placeYouAreHere(point);
+  map.flyTo({ center: point, zoom: 10, speed: 1.2 });
+  openPanelForPoint(point, name);
+}
+
+/** Drop (or move) a marker at the user's location. */
+function placeYouAreHere(point) {
+  if (youAreHereMarker) {
+    youAreHereMarker.setLngLat(point);
+    return;
+  }
+  const el = document.createElement('div');
+  el.className = 'you-are-here';
+  el.title = t.youAreHere;
+  youAreHereMarker = new maplibregl.Marker({ element: el })
+    .setLngLat(point)
+    .addTo(map);
+}
+
+/** Show a short, non-blocking message (reuses the sample-badge styling). */
+function flashLocateMessage(msg) {
+  let el = document.getElementById('locate-msg');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'locate-msg';
+    el.className = 'toast';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.classList.add('toast-show');
+  clearTimeout(flashLocateMessage._t);
+  flashLocateMessage._t = setTimeout(() => el.classList.remove('toast-show'), 5000);
+}
+
 function openPanelForPoint(point, placeName) {
   lastPoint = point;
   lastPlaceName = placeName ?? null;
@@ -380,6 +469,8 @@ function applyLanguage() {
   // Static chrome
   setText('brand-tag', t.tagline);
   setText('profile-btn', t.setProfile);
+  setText('locate-btn', t.locate);
+  setText('demo-btn', t.demo);
   setText('legend-title', t.legendTitle);
   setText('legend-note', t.legendNote);
   setText('coverage-note', t.coverageNote);
@@ -450,6 +541,8 @@ document.getElementById('panel-close').addEventListener('click', hidePanel);
 document.getElementById('profile-btn').addEventListener('click', openProfileModal);
 document.getElementById('profile-save').addEventListener('click', saveProfileFromForm);
 document.getElementById('lang-btn').addEventListener('click', toggleLanguage);
+document.getElementById('locate-btn').addEventListener('click', locateMe);
+document.getElementById('demo-btn').addEventListener('click', goToDemo);
 document.getElementById('profile-modal').addEventListener('click', (e) => {
   if (e.target.id === 'profile-modal') closeProfileModal();
 });

@@ -25,6 +25,10 @@ export const CONFIG = {
   KILNS_URL: '../data/kilns.geojson',
   STATIONS_URL: '../data/latest_pm25.geojson', // written by the ingest Lambda
 
+  // Demo location for testing and the demo video, used when the user is not
+  // physically in Bangladesh. Hazrat Shahjalal International Airport, Dhaka.
+  DEMO_LOCATION: { name: 'Dhaka Airport', point: [90.3978, 23.8433] },
+
   // Map framing for Bangladesh.
   BD_CENTER: [90.4, 23.7], // lon, lat (near Dhaka)
   BD_ZOOM: 6.2,

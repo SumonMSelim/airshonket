@@ -12,6 +12,13 @@ export const STRINGS = {
   en: {
     tagline: 'Breathe easy. Know the air.',
     setProfile: 'Set who you are',
+    locate: 'Find my location',
+    demo: 'Demo: Dhaka',
+    locating: 'Finding you...',
+    locateDenied: 'Location permission was denied. You can still tap any place on the map.',
+    locateUnavailable: 'Could not get your location. You can still tap any place on the map.',
+    locateOutside: 'Your location looks to be outside Bangladesh. Showing the map of Bangladesh instead.',
+    youAreHere: 'You are here',
     legendTitle: 'Air quality (PM2.5 AQI)',
     legendNote:
       'Brown dots are known brick kilns mapped in OpenStreetMap. They are the biggest winter source of fine particles.',
@@ -95,6 +102,13 @@ export const STRINGS = {
   bn: {
     tagline: 'স্বস্তিতে শ্বাস নিন। বাতাসের খবর জানুন।',
     setProfile: 'আপনি কে, জানান',
+    locate: 'আমার অবস্থান খুঁজুন',
+    demo: 'ডেমো: ঢাকা',
+    locating: 'খুঁজে দেখা হচ্ছে...',
+    locateDenied: 'অবস্থান ব্যবহারের অনুমতি দেওয়া হয়নি। আপনি মানচিত্রের যেকোনো জায়গায় ট্যাপ করতে পারেন।',
+    locateUnavailable: 'আপনার অবস্থান পাওয়া যায়নি। আপনি মানচিত্রের যেকোনো জায়গায় ট্যাপ করতে পারেন।',
+    locateOutside: 'আপনার অবস্থান বাংলাদেশের বাইরে বলে মনে হচ্ছে। বাংলাদেশের মানচিত্র দেখানো হচ্ছে।',
+    youAreHere: 'আপনি এখানে আছেন',
     legendTitle: 'বাতাসের মান (PM2.5 AQI)',
     legendNote:
       'বাদামি বিন্দুগুলো OpenStreetMap-এ চিহ্নিত ইটভাটা। শীতকালে সূক্ষ্ম ধূলিকণার সবচেয়ে বড় উৎস এগুলোই।',
