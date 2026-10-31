@@ -18,22 +18,29 @@
     <header class="app-header">
       <div class="brand">
         <span class="brand-name">AirShonket</span>
-        <span class="brand-tag">Breathe easy. Know the air.</span>
+        <span class="brand-tag" id="brand-tag">Breathe easy. Know the air.</span>
       </div>
-      <button id="profile-btn" class="profile-btn" type="button">
-        Set who you are
-      </button>
+      <div class="header-actions">
+        <button id="lang-btn" class="lang-btn" type="button">বাংলা</button>
+        <button id="profile-btn" class="profile-btn" type="button">
+          Set who you are
+        </button>
+      </div>
     </header>
 
     <main id="map" aria-label="Map of air quality across Bangladesh"></main>
 
     <!-- Legend -->
     <section id="legend" class="legend" aria-label="Air quality legend">
-      <h2 class="legend-title">Air quality (PM2.5 AQI)</h2>
+      <h2 class="legend-title" id="legend-title">Air quality (PM2.5 AQI)</h2>
       <ul class="legend-list" id="legend-list"></ul>
-      <p class="legend-note">
+      <p class="legend-note" id="legend-note">
         Brown dots are known brick kilns mapped in OpenStreetMap. They are the
         biggest winter source of fine particles.
+      </p>
+      <p class="legend-note coverage" id="coverage-note">
+        Live air monitoring is concentrated around Dhaka. Brick kilns are shown
+        for the whole country.
       </p>
     </section>
 
@@ -47,13 +54,13 @@
     <div id="profile-modal" class="modal modal-hidden" role="dialog" aria-modal="true" aria-labelledby="profile-title">
       <div class="modal-card">
         <h2 id="profile-title">Who is this for?</h2>
-        <p class="modal-sub">Pick what applies. The advice will fit you.</p>
+        <p class="modal-sub" id="profile-sub">Pick what applies. The advice will fit you.</p>
         <form id="profile-form" class="profile-options"></form>
         <button id="profile-save" class="primary-btn" type="button">Save</button>
       </div>
     </div>
 
-    <footer class="attribution">
+    <footer class="attribution" id="attribution">
       Air quality: OpenAQ. Kilns: © OpenStreetMap contributors (ODbL).
     </footer>
 

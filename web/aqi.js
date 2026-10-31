@@ -18,14 +18,16 @@ const PM25_BREAKPOINTS = [
   [325.5, 500.4, 401, 500],
 ];
 
-/** The six AQI bands, with colours used by the map and legend. */
+/** The six AQI bands, with colours used by the map and legend.
+ *  Labels are resolved per language in the UI via i18n `bands`.
+ */
 export const AQI_BANDS = [
-  { max: 50, key: 'good', label: 'Good', color: '#009966' },
-  { max: 100, key: 'moderate', label: 'Moderate', color: '#ffde33' },
-  { max: 150, key: 'usg', label: 'Unhealthy for sensitive groups', color: '#ff9933' },
-  { max: 200, key: 'unhealthy', label: 'Unhealthy', color: '#cc0033' },
-  { max: 300, key: 'very', label: 'Very unhealthy', color: '#660099' },
-  { max: Infinity, key: 'hazardous', label: 'Hazardous', color: '#7e0023' },
+  { max: 50, key: 'good', color: '#009966' },
+  { max: 100, key: 'moderate', color: '#ffde33' },
+  { max: 150, key: 'usg', color: '#ff9933' },
+  { max: 200, key: 'unhealthy', color: '#cc0033' },
+  { max: 300, key: 'very', color: '#660099' },
+  { max: Infinity, key: 'hazardous', color: '#7e0023' },
 ];
 
 /**
@@ -62,39 +64,10 @@ export function colorForPm25(pm25) {
 // Personalised actions
 // ---------------------------------------------------------------------------
 
-/** Profile tags the user can pick. "healthy" is the default baseline. */
-export const PROFILE_TAGS = [
-  { id: 'healthy', label: 'Healthy adult' },
-  { id: 'respiratory', label: 'Has asthma, heart, or lung condition' },
-  { id: 'child', label: 'Young child at home' },
-  { id: 'elderly', label: 'Elderly' },
-  { id: 'outdoor', label: 'Outdoor worker or cyclist' },
-];
-
-// Base advice per band. Short, plain sentences.
-const BASE_ADVICE = {
-  good: ['Air is clean.', 'A good day to open windows and go outside.'],
-  moderate: [
-    'Air is acceptable for most people.',
-    'If you are unusually sensitive, take it easy outdoors.',
-  ],
-  usg: [
-    'Air is unhealthy for sensitive people.',
-    'Most people are fine, but sensitive groups should limit long spells outside.',
-  ],
-  unhealthy: [
-    'Air is unhealthy.',
-    'Wear a mask outside. Keep windows shut. Use an air purifier if you have one.',
-  ],
-  very: [
-    'Air is very unhealthy.',
-    'Avoid outdoor activity. A mask is essential. Seal windows.',
-  ],
-  hazardous: [
-    'Air is hazardous.',
-    'Stay indoors. Use an N95 mask if you must go out.',
-  ],
-};
+/** Profile tag ids the user can pick. "healthy" is the default baseline.
+ *  Labels are resolved per language in the UI via i18n `profiles`.
+ */
+export const PROFILE_TAG_IDS = ['healthy', 'respiratory', 'child', 'elderly', 'outdoor'];
 
 // Whether a band is risky for sensitive groups (usg and worse).
 function isSensitiveRisk(bandKey) {
@@ -103,42 +76,37 @@ function isSensitiveRisk(bandKey) {
 
 /**
  * Build a list of advice sentences for a PM2.5 reading and a set of profile
- * tags. Returns { aqi, band, lines } where lines is an array of strings.
+ * tags, in the given language. Returns { aqi, band, lines }.
  *
  * @param {number} pm25  PM2.5 concentration in ug/m3
  * @param {string[]} profile  array of profile tag ids
+ * @param {object} t  the strings object for the chosen language (STRINGS[lang])
  */
-export function adviceFor(pm25, profile = ['healthy']) {
+export function adviceFor(pm25, profile, t) {
   const aqi = pm25ToAqi(pm25);
   const band = bandForAqi(aqi);
   if (!band) {
-    return { aqi: null, band: null, lines: ['No reading available for this place.'] };
+    return { aqi: null, band: null, lines: [t.noReading] };
   }
 
-  const tags = new Set(profile.length ? profile : ['healthy']);
-  const lines = [...BASE_ADVICE[band.key]];
-
-  // Extra, tag-specific lines, only when the air is actually risky.
+  const tags = new Set(profile && profile.length ? profile : ['healthy']);
+  const lines = [...t.advice[band.key]];
   const risky = isSensitiveRisk(band.key);
 
   if (tags.has('respiratory') && band.key !== 'good') {
-    lines.push(
-      risky
-        ? 'You told us someone has asthma, heart, or lung trouble. Keep rescue medicine close and stay indoors as much as you can.'
-        : 'If you have asthma, heart, or lung trouble, keep your medicine close.'
-    );
+    lines.push(risky ? t.extra.respiratoryRisky : t.extra.respiratoryMild);
   }
   if (tags.has('child') && risky) {
-    lines.push('Keep young children indoors and away from open windows.');
+    lines.push(t.extra.child);
   }
   if (tags.has('elderly') && risky) {
-    lines.push('Older people should rest indoors and avoid any outdoor effort.');
+    lines.push(t.extra.elderly);
   }
   if (tags.has('outdoor')) {
     if (band.key === 'unhealthy') {
-      lines.push('If you work or cycle outside, wear a proper mask and take breaks indoors.');
+      lines.push(t.extra.outdoorUnhealthy);
     } else if (risky && band.key !== 'usg') {
-      lines.push('Avoid outdoor work or cycling today if you possibly can. If you must, wear an N95 mask.');
+      lines.push(t.extra.outdoorRisky);
     }
   }
 

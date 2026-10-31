@@ -11,14 +11,24 @@
 import { CONFIG } from './config.js';
 import {
   AQI_BANDS,
-  PROFILE_TAGS,
+  PROFILE_TAG_IDS,
   pm25ToAqi,
   bandForAqi,
   colorForPm25,
   adviceFor,
 } from './aqi.js';
+import { STRINGS, LANG_KEY, initialLang, saveLang } from './i18n.js';
 
 const PROFILE_KEY = 'airshonket.profile';
+
+// Current language and its string table.
+let lang = initialLang();
+let t = STRINGS[lang];
+
+// Remember the last clicked point so we can re-render the panel on language
+// or profile change without needing a fresh click.
+let lastPoint = null;
+let lastPlaceName = null;
 
 // ---------------------------------------------------------------------------
 // Profile (stored in the browser only)
@@ -105,6 +115,8 @@ map.on('load', async () => {
   addKilnLayer();
   addStationLayer();
   buildLegend();
+  applyLanguage();
+  applyMapLabelLanguage();
   map.on('click', onMapClick);
 });
 
@@ -241,6 +253,9 @@ function onMapClick(e) {
 }
 
 function openPanelForPoint(point, placeName) {
+  lastPoint = point;
+  lastPlaceName = placeName ?? null;
+
   const near = nearestStation(point, state.stations);
   const kilns15 = kilnsWithin(point, state.kilns, 15);
   const kilns5 = kilnsWithin(point, state.kilns, 5);
@@ -248,43 +263,55 @@ function openPanelForPoint(point, placeName) {
   const body = document.getElementById('panel-body');
 
   if (!near) {
-    body.innerHTML = `<p>No air quality station data loaded yet.</p>`;
+    body.innerHTML = `<p>${escapeHtml(t.noReading)}</p>`;
     showPanel();
     return;
   }
 
   const pm25 = Number(near.feature.properties.pm25);
-  const label = placeName || near.feature.properties.name || 'this area';
-  const { aqi, band, lines } = adviceFor(pm25, profile);
-  const distNote =
+  const label = placeName || near.feature.properties.name || '';
+  const bandLabel = t.bands[bandForAqi(pm25ToAqi(pm25)).key];
+  const { aqi, band, lines } = adviceFor(pm25, profile, t);
+
+  const sub =
     near.km < 2
-      ? 'at this spot'
-      : `from the nearest station, about ${near.km.toFixed(0)} km away (${near.feature.properties.name})`;
+      ? fill(t.readingSubHere, { pm25: pm25.toFixed(0) })
+      : fill(t.readingSubAway, {
+          pm25: pm25.toFixed(0),
+          km: near.km.toFixed(0),
+          name: near.feature.properties.name || '',
+        });
+
+  const within5 = kilns5 ? fill(t.within5, { n5: kilns5 }) : '';
+  const kilnsText = fill(t.kilnsLine, {
+    n15: kilns15,
+    plural: lang === 'en' && kilns15 !== 1 ? 's' : '',
+    within5,
+  });
 
   body.innerHTML = `
     <div class="reading" style="--band:${band.color}">
       <div class="reading-aqi">${aqi}</div>
       <div class="reading-meta">
-        <div class="reading-band">${band.label}</div>
-        <div class="reading-place">Near ${escapeHtml(String(label))}</div>
+        <div class="reading-band">${escapeHtml(t.bands[band.key])}</div>
+        <div class="reading-place">${escapeHtml(t.near)} ${escapeHtml(String(label))}</div>
       </div>
     </div>
-    <p class="reading-sub">PM2.5 ${pm25.toFixed(0)} µg/m³, ${distNote}.</p>
+    <p class="reading-sub">${escapeHtml(sub)}</p>
 
-    <h3 class="panel-h">What to do</h3>
+    <h3 class="panel-h">${escapeHtml(t.whatToDo)}</h3>
     <ul class="advice">${lines.map((l) => `<li>${escapeHtml(l)}</li>`).join('')}</ul>
 
-    <h3 class="panel-h">Nearby sources</h3>
-    <p class="sources">
-      ${kilns15} known brick kiln${kilns15 === 1 ? '' : 's'} within 15 km
-      ${kilns5 ? `(${kilns5} within 5 km)` : ''}.
-      Kilns are the biggest winter source of fine particles here.
-    </p>
-    <p class="panel-foot">
-      Advice is general public guidance based on standard AQI bands, not medical advice.
-    </p>
+    <h3 class="panel-h">${escapeHtml(t.nearbySources)}</h3>
+    <p class="sources">${escapeHtml(kilnsText)}</p>
+    <p class="panel-foot">${escapeHtml(t.medicalNote)}</p>
   `;
   showPanel();
+}
+
+/** Replace {key} placeholders in a template with values. */
+function fill(template, values) {
+  return template.replace(/\{(\w+)\}/g, (_, k) => (k in values ? String(values[k]) : ''));
 }
 
 // ---------------------------------------------------------------------------
@@ -302,17 +329,17 @@ function buildLegend() {
   const list = document.getElementById('legend-list');
   list.innerHTML = AQI_BANDS.map(
     (b) =>
-      `<li><span class="swatch" style="background:${b.color}"></span>${escapeHtml(b.label)}</li>`
+      `<li><span class="swatch" style="background:${b.color}"></span>${escapeHtml(t.bands[b.key])}</li>`
   ).join('');
 }
 
 function buildProfileForm() {
   const form = document.getElementById('profile-form');
-  form.innerHTML = PROFILE_TAGS.map(
-    (t) => `
+  form.innerHTML = PROFILE_TAG_IDS.map(
+    (id) => `
     <label class="profile-option">
-      <input type="checkbox" value="${t.id}" ${profile.includes(t.id) ? 'checked' : ''} />
-      <span>${escapeHtml(t.label)}</span>
+      <input type="checkbox" value="${id}" ${profile.includes(id) ? 'checked' : ''} />
+      <span>${escapeHtml(t.profiles[id])}</span>
     </label>`
   ).join('');
 }
@@ -337,8 +364,77 @@ function showSampleBadge() {
   const el = document.createElement('div');
   el.id = 'sample-badge';
   el.className = 'sample-badge';
-  el.textContent = 'Showing sample air data';
+  el.textContent = t.sampleBadge;
   document.body.appendChild(el);
+}
+
+// ---------------------------------------------------------------------------
+// Language
+// ---------------------------------------------------------------------------
+
+/** Apply the current language to all static chrome and re-render dynamic bits. */
+function applyLanguage() {
+  t = STRINGS[lang];
+  document.documentElement.lang = lang;
+
+  // Static chrome
+  setText('brand-tag', t.tagline);
+  setText('profile-btn', t.setProfile);
+  setText('legend-title', t.legendTitle);
+  setText('legend-note', t.legendNote);
+  setText('coverage-note', t.coverageNote);
+  setText('profile-title', t.profileTitle);
+  setText('profile-sub', t.profileSub);
+  setText('profile-save', t.save);
+  setText('attribution', t.attribution);
+  const closeBtn = document.getElementById('panel-close');
+  if (closeBtn) closeBtn.setAttribute('aria-label', t.close);
+  const langBtn = document.getElementById('lang-btn');
+  if (langBtn) langBtn.textContent = lang === 'en' ? 'বাংলা' : 'English';
+
+  const badge = document.getElementById('sample-badge');
+  if (badge) badge.textContent = t.sampleBadge;
+
+  // Dynamic bits that depend on language
+  if (map.getLayer && map.getSource && map.getSource('kilns')) buildLegend();
+  if (lastPoint) openPanelForPoint(lastPoint, lastPlaceName);
+}
+
+function toggleLanguage() {
+  lang = lang === 'en' ? 'bn' : 'en';
+  saveLang(lang);
+  applyLanguage();
+  applyMapLabelLanguage();
+}
+
+/** Ask the base map to show place-name labels in the chosen language.
+ *  Works where the vector style has a name_{lang} / name:{lang} field and the
+ *  data has that translation; otherwise labels stay in their default. */
+function applyMapLabelLanguage() {
+  const style = map.getStyle && map.getStyle();
+  if (!style || !style.layers) return;
+  const field = lang === 'bn' ? 'name:bn' : 'name:en';
+  for (const layer of style.layers) {
+    if (layer.type !== 'symbol') continue;
+    const tf = layer.layout && layer.layout['text-field'];
+    if (!tf) continue;
+    try {
+      // Prefer the language-specific name, fall back to the generic name.
+      map.setLayoutProperty(layer.id, 'text-field', [
+        'coalesce',
+        ['get', field],
+        ['get', 'name:latin'],
+        ['get', 'name'],
+      ]);
+    } catch {
+      // Some layers do not allow overriding; skip them quietly.
+    }
+  }
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
 }
 
 // ---------------------------------------------------------------------------
@@ -353,9 +449,13 @@ function escapeHtml(s) {
 document.getElementById('panel-close').addEventListener('click', hidePanel);
 document.getElementById('profile-btn').addEventListener('click', openProfileModal);
 document.getElementById('profile-save').addEventListener('click', saveProfileFromForm);
+document.getElementById('lang-btn').addEventListener('click', toggleLanguage);
 document.getElementById('profile-modal').addEventListener('click', (e) => {
   if (e.target.id === 'profile-modal') closeProfileModal();
 });
+
+// Set initial static text immediately (before the map finishes loading).
+applyLanguage();
 
 // Expose a couple of helpers for quick console testing / future unit tests.
 window.__airshonket = { pm25ToAqi, bandForAqi, colorForPm25, adviceFor, haversineKm };
