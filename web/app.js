@@ -18,12 +18,22 @@ import {
   adviceFor,
 } from './aqi.js';
 import { STRINGS, LANG_KEY, initialLang, saveLang } from './i18n.js';
+import {
+  fetchWind,
+  isUpwind,
+  compassName,
+  compassNameBn,
+} from './wind.js';
 
 const PROFILE_KEY = 'airshonket.profile';
 
 // Current language and its string table.
 let lang = initialLang();
 let t = STRINGS[lang];
+
+// Current wind for the region (direction the wind comes FROM). Null until the
+// first fetch resolves, or if the wind service is unavailable.
+let wind = null;
 
 // Remember the last clicked point so we can re-render the panel on language
 // or profile change without needing a fresh click.
@@ -118,7 +128,19 @@ map.on('load', async () => {
   applyLanguage();
   applyMapLabelLanguage();
   map.on('click', onMapClick);
+  // Fetch regional wind in the background; the panel updates once it arrives.
+  refreshWind();
 });
+
+// Fetch wind for the centre of the map's data (Dhaka). One reading for the
+// region is enough for v1; the panel says so honestly.
+async function refreshWind() {
+  const [lon, lat] = CONFIG.BD_CENTER;
+  wind = await fetchWind(lat, lon);
+  if (wind) drawWindArrow(wind.fromDeg);
+  // If a panel is open, re-render it so the upwind line appears.
+  if (lastPoint) openPanelForPoint(lastPoint, lastPlaceName);
+}
 
 async function loadData() {
   const [kilns, stations] = await Promise.all([
@@ -372,11 +394,23 @@ function openPanelForPoint(point, placeName) {
         });
 
   const within5 = kilns5 ? fill(t.within5, { n5: kilns5 }) : '';
-  const kilnsText = fill(t.kilnsLine, {
+  let kilnsText = fill(t.kilnsLine, {
     n15: kilns15,
     plural: lang === 'en' && kilns15 !== 1 ? 's' : '',
     within5,
   });
+
+  // Upwind attribution: which nearby kilns are upwind given today's wind.
+  if (wind && kilns15 > 0) {
+    const dir = lang === 'bn' ? compassNameBn(wind.fromDeg) : compassName(wind.fromDeg);
+    let nUp = 0;
+    for (const f of state.kilns) {
+      const c = f.geometry.coordinates;
+      if (haversineKm(point, c) <= 15 && isUpwind(point, c, wind.fromDeg)) nUp += 1;
+    }
+    const upTemplate = nUp > 0 ? t.upwindLine : t.upwindNone;
+    kilnsText += ' ' + fill(upTemplate, { dir, nUp });
+  }
 
   body.innerHTML = `
     <div class="reading" style="--band:${band.color}">
@@ -488,6 +522,7 @@ function applyLanguage() {
 
   // Dynamic bits that depend on language
   if (map.getLayer && map.getSource && map.getSource('kilns')) buildLegend();
+  if (wind) drawWindArrow(wind.fromDeg);
   if (lastPoint) openPanelForPoint(lastPoint, lastPlaceName);
 }
 
@@ -526,6 +561,29 @@ function applyMapLabelLanguage() {
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
+}
+
+// ---------------------------------------------------------------------------
+// Wind arrow indicator
+// ---------------------------------------------------------------------------
+
+/** Draw a small fixed wind indicator. The arrow points in the direction the
+ *  wind is blowing TOWARD (fromDeg + 180), which is the way smoke travels. */
+function drawWindArrow(fromDeg) {
+  let el = document.getElementById('wind-indicator');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'wind-indicator';
+    el.className = 'wind-indicator';
+    el.innerHTML =
+      '<span class="wind-arrow">&uarr;</span><span class="wind-label"></span>';
+    document.body.appendChild(el);
+  }
+  const towardDeg = (fromDeg + 180) % 360;
+  el.querySelector('.wind-arrow').style.transform = `rotate(${towardDeg}deg)`;
+  const dir = lang === 'bn' ? compassNameBn(fromDeg) : compassName(fromDeg);
+  el.querySelector('.wind-label').textContent =
+    (lang === 'bn' ? 'বাতাস: ' : 'Wind from ') + dir;
 }
 
 // ---------------------------------------------------------------------------

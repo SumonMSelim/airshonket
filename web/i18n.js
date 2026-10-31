@@ -41,6 +41,11 @@ export const STRINGS = {
     kilnsLine:
       '{n15} known brick kiln{plural} within 15 km{within5}. Kilns are the biggest winter source of fine particles here.',
     within5: ' ({n5} within 5 km)',
+    upwindLine:
+      'Wind is from the {dir} today, so {nUp} of them are upwind of you and likely affecting your air right now.',
+    upwindNone:
+      'Wind is from the {dir} today, so few of them are upwind of you right now.',
+    windUnavailable: 'Live wind data is not available right now.',
     medicalNote:
       'Advice is general public guidance based on standard AQI bands, not medical advice.',
     // AQI band labels
@@ -130,6 +135,11 @@ export const STRINGS = {
     kilnsLine:
       '১৫ কিমির মধ্যে {n15}টি পরিচিত ইটভাটা{within5}। শীতকালে সূক্ষ্ম ধূলিকণার সবচেয়ে বড় উৎস এগুলোই।',
     within5: ' ({n5}টি ৫ কিমির মধ্যে)',
+    upwindLine:
+      'আজ বাতাস আসছে {dir} দিক থেকে, তাই এর মধ্যে {nUp}টি আপনার উজানে এবং এখন আপনার বাতাসে প্রভাব ফেলছে।',
+    upwindNone:
+      'আজ বাতাস আসছে {dir} দিক থেকে, তাই এখন খুব কম ভাটাই আপনার উজানে আছে।',
+    windUnavailable: 'এই মুহূর্তে সরাসরি বাতাসের দিকের তথ্য পাওয়া যাচ্ছে না।',
     medicalNote:
       'এই পরামর্শ সাধারণ জনস্বাস্থ্য নির্দেশনা, কোনো চিকিৎসা পরামর্শ নয়।',
     bands: {
