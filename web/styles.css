@@ -87,6 +87,81 @@ body {
   inset: 0;
 }
 
+/* Loading overlay */
+.loading {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: #0f1419;
+  color: #cdd6df;
+  font-size: 14px;
+  transition: opacity 0.4s;
+}
+.loading-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+  border-top-color: #1a73e8;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* First-time hint */
+.hint {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 11;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #1a73e8;
+  color: #fff;
+  font-size: 13px;
+  padding: 8px 10px 8px 14px;
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+  max-width: calc(100vw - 32px);
+}
+.hint-hidden {
+  display: none;
+}
+.hint-close {
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  color: #fff;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  flex: none;
+}
+
+/* About modal body */
+.about-body p {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text);
+  margin: 0 0 10px;
+}
+
 /* Legend */
 .legend {
   position: fixed;
@@ -330,6 +405,7 @@ body {
   display: none;
 }
 .modal-card {
+  position: relative;
   background: #fff;
   border-radius: var(--radius);
   padding: 22px;

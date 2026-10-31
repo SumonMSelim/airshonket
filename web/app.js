@@ -121,13 +121,15 @@ const map = new maplibregl.Map({
 map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
 
 map.on('load', async () => {
-  await loadData();
+  const ok = await loadData();
   addKilnLayer();
   addStationLayer();
   buildLegend();
   applyLanguage();
   applyMapLabelLanguage();
   map.on('click', onMapClick);
+  hideLoading();
+  if (ok) maybeShowHint();
   // Fetch regional wind in the background; the panel updates once it arrives.
   refreshWind();
 });
@@ -149,6 +151,8 @@ async function loadData() {
   ]);
   state.kilns = kilns?.features ?? [];
   state.stations = stations?.features ?? [];
+  // Report whether we have the essentials for a useful map.
+  return state.kilns.length > 0 || state.stations.length > 0;
 }
 
 async function fetchJson(url) {
@@ -271,6 +275,7 @@ function addStationLayer() {
 function onMapClick(e) {
   // Station clicks are handled by their own handler; avoid double-firing.
   if (e.originalEvent.__stationClick) return;
+  dismissHint();
   openPanelForPoint([e.lngLat.lng, e.lngLat.lat]);
 }
 
@@ -505,12 +510,16 @@ function applyLanguage() {
   setText('profile-btn', t.setProfile);
   setText('locate-btn', t.locate);
   setText('demo-btn', t.demo);
+  setText('about-btn', '?');
+  setText('loading-text', t.loading);
+  setText('hint-text', t.hint);
   setText('legend-title', t.legendTitle);
   setText('legend-note', t.legendNote);
   setText('coverage-note', t.coverageNote);
   setText('profile-title', t.profileTitle);
   setText('profile-sub', t.profileSub);
   setText('profile-save', t.save);
+  setText('about-title', t.aboutTitle);
   setText('attribution', t.attribution);
   const closeBtn = document.getElementById('panel-close');
   if (closeBtn) closeBtn.setAttribute('aria-label', t.close);
@@ -564,6 +573,39 @@ function setText(id, value) {
 }
 
 // ---------------------------------------------------------------------------
+// Loading, hint, about
+// ---------------------------------------------------------------------------
+
+const HINT_KEY = 'airshonket.hintseen';
+
+function hideLoading() {
+  const el = document.getElementById('loading');
+  if (el) el.classList.add('loading-hidden');
+}
+
+/** Show the tap hint once per browser, unless already dismissed. */
+function maybeShowHint() {
+  if (localStorage.getItem(HINT_KEY)) return;
+  const el = document.getElementById('hint');
+  if (el) el.classList.remove('hint-hidden');
+}
+
+function dismissHint() {
+  localStorage.setItem(HINT_KEY, '1');
+  const el = document.getElementById('hint');
+  if (el) el.classList.add('hint-hidden');
+}
+
+function openAbout() {
+  const body = document.getElementById('about-body');
+  body.innerHTML = t.aboutBody.map((p) => `<p>${escapeHtml(p)}</p>`).join('');
+  document.getElementById('about-modal').classList.remove('modal-hidden');
+}
+function closeAbout() {
+  document.getElementById('about-modal').classList.add('modal-hidden');
+}
+
+// ---------------------------------------------------------------------------
 // Wind arrow indicator
 // ---------------------------------------------------------------------------
 
@@ -601,6 +643,12 @@ document.getElementById('profile-save').addEventListener('click', saveProfileFro
 document.getElementById('lang-btn').addEventListener('click', toggleLanguage);
 document.getElementById('locate-btn').addEventListener('click', locateMe);
 document.getElementById('demo-btn').addEventListener('click', goToDemo);
+document.getElementById('about-btn').addEventListener('click', openAbout);
+document.getElementById('about-close').addEventListener('click', closeAbout);
+document.getElementById('about-modal').addEventListener('click', (e) => {
+  if (e.target.id === 'about-modal') closeAbout();
+});
+document.getElementById('hint-close').addEventListener('click', dismissHint);
 document.getElementById('profile-modal').addEventListener('click', (e) => {
   if (e.target.id === 'profile-modal') closeProfileModal();
 });
