@@ -1,0 +1,23 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "source": "SAMPLE DATA for local development only — not real readings",
+    "note": "Replaced at runtime by the ingest Lambda output from OpenAQ.",
+    "parameter": "pm25",
+    "unit": "ug/m3"
+  },
+  "features": [
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [90.4125, 23.8103] }, "properties": { "name": "Dhaka", "pm25": 196.0 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [90.4990, 23.6238] }, "properties": { "name": "Narayanganj", "pm25": 212.0 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [90.4203, 23.9999] }, "properties": { "name": "Gazipur", "pm25": 168.0 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [90.2548, 23.8583] }, "properties": { "name": "Savar", "pm25": 158.0 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [90.4074, 24.7471] }, "properties": { "name": "Mymensingh", "pm25": 96.0 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [91.7832, 22.3569] }, "properties": { "name": "Chattogram", "pm25": 84.0 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [89.5403, 22.8456] }, "properties": { "name": "Khulna", "pm25": 72.0 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [91.1809, 23.4607] }, "properties": { "name": "Cumilla", "pm25": 112.0 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [90.3535, 22.7010] }, "properties": { "name": "Barishal", "pm25": 58.0 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [88.6042, 24.3745] }, "properties": { "name": "Rajshahi", "pm25": 44.0 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [91.8687, 24.8949] }, "properties": { "name": "Sylhet", "pm25": 31.0 } },
+    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [89.2752, 25.7439] }, "properties": { "name": "Rangpur", "pm25": 38.0 } }
+  ]
+}
