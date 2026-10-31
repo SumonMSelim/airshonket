@@ -17,7 +17,7 @@ import {
   colorForPm25,
   adviceFor,
 } from './aqi.js';
-import { STRINGS, LANG_KEY, initialLang, saveLang } from './i18n.js';
+import { STRINGS, LANG_KEY, initialLang, saveLang, localiseNumber } from './i18n.js';
 import {
   fetchWind,
   isUpwind,
@@ -386,21 +386,23 @@ function openPanelForPoint(point, placeName) {
 
   const pm25 = Number(near.feature.properties.pm25);
   const label = placeName || near.feature.properties.name || '';
-  const bandLabel = t.bands[bandForAqi(pm25ToAqi(pm25)).key];
   const { aqi, band, lines } = adviceFor(pm25, profile, t);
+
+  // Localise numbers: Bangla digits in bn mode, Western in en.
+  const num = (v) => localiseNumber(v, lang);
 
   const sub =
     near.km < 2
-      ? fill(t.readingSubHere, { pm25: pm25.toFixed(0) })
+      ? fill(t.readingSubHere, { pm25: num(pm25.toFixed(0)) })
       : fill(t.readingSubAway, {
-          pm25: pm25.toFixed(0),
-          km: near.km.toFixed(0),
+          pm25: num(pm25.toFixed(0)),
+          km: num(near.km.toFixed(0)),
           name: near.feature.properties.name || '',
         });
 
-  const within5 = kilns5 ? fill(t.within5, { n5: kilns5 }) : '';
+  const within5 = kilns5 ? fill(t.within5, { n5: num(kilns5) }) : '';
   let kilnsText = fill(t.kilnsLine, {
-    n15: kilns15,
+    n15: num(kilns15),
     plural: lang === 'en' && kilns15 !== 1 ? 's' : '',
     within5,
   });
@@ -414,12 +416,12 @@ function openPanelForPoint(point, placeName) {
       if (haversineKm(point, c) <= 15 && isUpwind(point, c, wind.fromDeg)) nUp += 1;
     }
     const upTemplate = nUp > 0 ? t.upwindLine : t.upwindNone;
-    kilnsText += ' ' + fill(upTemplate, { dir, nUp });
+    kilnsText += ' ' + fill(upTemplate, { dir, nUp: num(nUp) });
   }
 
   body.innerHTML = `
     <div class="reading" style="--band:${band.color}">
-      <div class="reading-aqi">${aqi}</div>
+      <div class="reading-aqi">${escapeHtml(num(aqi))}</div>
       <div class="reading-meta">
         <div class="reading-band">${escapeHtml(t.bands[band.key])}</div>
         <div class="reading-place">${escapeHtml(t.near)} ${escapeHtml(String(label))}</div>
@@ -506,6 +508,7 @@ function applyLanguage() {
   document.documentElement.lang = lang;
 
   // Static chrome
+  setText('brand-name', t.brand);
   setText('brand-tag', t.tagline);
   setText('profile-btn', t.setProfile);
   setText('locate-btn', t.locate);

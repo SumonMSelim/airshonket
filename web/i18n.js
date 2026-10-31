@@ -8,8 +8,21 @@
 
 export const LANG_KEY = 'airshonket.lang';
 
+/** Convert Western digits in a string to Bangla-Bengali digits.
+ *  Only digits are mapped; everything else is left as is. */
+export function toBanglaDigits(input) {
+  const map = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  return String(input).replace(/[0-9]/g, (d) => map[Number(d)]);
+}
+
+/** Localise a number for the given language. English keeps Western digits. */
+export function localiseNumber(value, lang) {
+  return lang === 'bn' ? toBanglaDigits(value) : String(value);
+}
+
 export const STRINGS = {
   en: {
+    brand: 'AirShonket',
     tagline: 'Breathe easy. Know the air.',
     setProfile: 'Set who you are',
     locate: 'Find my location',
@@ -116,6 +129,7 @@ export const STRINGS = {
   },
 
   bn: {
+    brand: 'এয়ারশনকেত',
     tagline: 'স্বস্তিতে শ্বাস নিন। বাতাসের খবর জানুন।',
     setProfile: 'আপনি কে, জানান',
     locate: 'আমার অবস্থান খুঁজুন',
