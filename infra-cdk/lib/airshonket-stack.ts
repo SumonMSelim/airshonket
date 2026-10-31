@@ -136,7 +136,7 @@ export class AirshonketStack extends cdk.Stack {
     });
 
     // ------------------------------------------------- amazon location (maps)
-    // v2 Standard style is served via an API key alone — no Map resource. The
+    // v2 Standard style is served via an API key alone (no Map resource). The
     // key is restricted to map tile actions, so it is safe to ship in the
     // public static site.
     const mapKey = new location.CfnAPIKey(this, 'MapApiKey', {

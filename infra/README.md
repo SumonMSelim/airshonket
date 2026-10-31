@@ -50,7 +50,7 @@ So the site and the data must sit so those relative paths resolve. Two ways:
 
 1. Serve `web/` at the CloudFront **root** and put data at `/data/` (one level
    up does not exist at the root, so for hosting we change the app to fetch
-   `data/...` — see note below), **or**
+   `data/...`, see note below), **or**
 2. Keep `web/` and `data/` as sibling folders under one prefix and point the
    distribution's default root object at `web/index.html`.
 

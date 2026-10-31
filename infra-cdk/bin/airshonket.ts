@@ -11,6 +11,6 @@ new AirshonketStack(app, 'AirshonketStack', {
     region: process.env.CDK_DEFAULT_REGION,
   },
   description:
-    'AirShonket — Bangladesh air quality map. S3 + CloudFront site, ingest ' +
+    'AirShonket: Bangladesh air quality map. S3 + CloudFront site, ingest ' +
     'Lambda on a schedule, and an Amazon Location Service map API key.',
 });

@@ -46,11 +46,11 @@ npx cdk deploy
 
 On success CDK prints outputs:
 
-- `SiteUrl` — the public map URL (allow ~10 min on first deploy).
-- `DataBucketName` — the bucket name.
-- `MapApiKeyName` — the Location API key name. Get its value with:
+- `SiteUrl`: the public map URL (allow ~10 min on first deploy).
+- `DataBucketName`: the bucket name.
+- `MapApiKeyName`: the Location API key name. Get its value with:
   `aws location describe-key --key-name airshonket-maps-key --region us-east-1 --query Key --output text`
-- `MapStyleUrlTemplate` — paste the key value into `web/config.js` as
+- `MapStyleUrlTemplate`: paste the key value into `web/config.js` as
   `LOCATION_STYLE_URL`, then redeploy so the live site uses the AWS base map.
 
 ## Cost safety

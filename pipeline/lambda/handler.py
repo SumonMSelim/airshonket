@@ -4,8 +4,8 @@ Runs on a schedule (Amazon EventBridge). For each Bangladesh station it reads
 the most recent valid PM2.5 reading from the OpenAQ public archive on Amazon
 S3, then writes two things to our own S3 bucket:
 
-  1. latest_pm25.geojson  — the small file the map reads (served via CloudFront)
-  2. snapshots/dt=<date>/latest_pm25_<ts>.json — an append-only history record
+  1. latest_pm25.geojson:  the small file the map reads (served via CloudFront)
+  2. snapshots/dt=<date>/latest_pm25_<ts>.json: an append-only history record
      that the Iceberg table / Athena read for trends.
 
 Environment variables:

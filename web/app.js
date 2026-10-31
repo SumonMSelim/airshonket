@@ -1,4 +1,4 @@
-// AirShonket — map application.
+// AirShonket map application.
 //
 // Renders Bangladesh with two data layers:
 //   1. Air quality stations (PM2.5), coloured by AQI band.

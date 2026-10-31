@@ -1,4 +1,4 @@
-# AirShonket — Project Scope
+# AirShonket: Project Scope
 
 Breathe easy. Know the air, know what to do.
 
@@ -30,7 +30,7 @@ AirShonket answers three questions for an ordinary person:
 
 Two layers of open data. Both are free to use and contain no personal data.
 
-### Layer 1 — Live and recent air quality (OpenAQ)  [VERIFIED]
+### Layer 1: Live and recent air quality (OpenAQ)  [VERIFIED]
 
 - Source: OpenAQ. It gathers readings from government and other monitors.
 - We read the public OpenAQ archive on Amazon S3:
@@ -53,7 +53,7 @@ show real monitor points where they exist. We will draw a careful interpolated
 surface, but we will be clear on the map where data is thin. We will not fake
 precision where there are no monitors.
 
-### Layer 2 — Pollution sources (brick kilns)  [VERIFIED, source changed]
+### Layer 2: Pollution sources (brick kilns)  [VERIFIED, source changed]
 
 - Source: OpenStreetMap, queried through the Overpass API.
 - Licence: ODbL. Open with attribution. This satisfies the rules.
@@ -74,7 +74,7 @@ Rejected sources, recorded so we do not revisit them:
 - SentinelKilnDB. Point data sits on Kaggle behind an account, and the public
   GitHub repo covers India, not Bangladesh, with no licence file. Too uncertain.
 
-### Optional richer layer (stretch only) — Edinburgh open aggregates  [VERIFIED]
+### Optional richer layer (stretch only): Edinburgh open aggregates  [VERIFIED]
 
 - Source: the Edinburgh and Nottingham study open supplementary data on Zenodo.
 - Licence: CC-BY-4.0. Open with attribution.
@@ -129,7 +129,7 @@ bands. It is not personal medical advice. The wording makes that clear.
 
 ---
 
-## 4. The signature feature — source attribution
+## 4. The signature feature: source attribution
 
 When the user taps a place, they see more than a number. They see the likely
 sources near them.

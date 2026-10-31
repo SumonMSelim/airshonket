@@ -30,12 +30,12 @@ docs/        scope and design notes
 
 ## AWS services
 
-- Amazon S3 — raw snapshots, Iceberg table, static datasets, pre-aggregated files.
-- AWS Lambda — scheduled ingest, Athena queries, writing the files the map reads.
-- Amazon EventBridge — triggers the ingest Lambda on a schedule.
-- Apache Iceberg on S3 + Amazon Athena — history and aggregation.
-- Amazon Location Service — base map tiles.
-- Amazon CloudFront — serves the static web app.
+- Amazon S3: raw snapshots, Iceberg table, static datasets, pre-aggregated files.
+- AWS Lambda: scheduled ingest, Athena queries, writing the files the map reads.
+- Amazon EventBridge: triggers the ingest Lambda on a schedule.
+- Apache Iceberg on S3 + Amazon Athena: history and aggregation.
+- Amazon Location Service: base map tiles.
+- Amazon CloudFront: serves the static web app.
 
 The front end never calls Athena directly. Lambda writes small static files to
 S3, and the map reads those through CloudFront. This keeps the site fast and the
