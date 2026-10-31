@@ -13,8 +13,11 @@ export const CONFIG = {
   //   https://maps.geo.<region>.amazonaws.com/v2/styles/Standard/descriptor?key=<API_KEY>
   LOCATION_STYLE_URL: null,
 
-  // Open fallback style for local development (MapLibre demo tiles).
-  DEMO_STYLE_URL: 'https://demotiles.maplibre.org/style.json',
+  // Open fallback style for local development. CARTO Voyager has city names,
+  // boundaries, roads and rivers, so the map reads properly before AWS is
+  // wired up. Swapped for Amazon Location Service via LOCATION_STYLE_URL.
+  DEMO_STYLE_URL:
+    'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
 
   // Where the map reads its data. These are static files written by the
   // pipeline to S3 and served through CloudFront. For local dev they are
