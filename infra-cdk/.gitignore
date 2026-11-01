@@ -7,3 +7,6 @@ node_modules
 .cdk.staging
 cdk.out
 dist/
+
+# Deploy outputs (contains resource names, regenerated each deploy)
+cdk-outputs.json

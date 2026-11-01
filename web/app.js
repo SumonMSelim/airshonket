@@ -601,7 +601,15 @@ function dismissHint() {
 
 function openAbout() {
   const body = document.getElementById('about-body');
-  body.innerHTML = t.aboutBody.map((p) => `<p>${escapeHtml(p)}</p>`).join('');
+  const paras = t.aboutBody.map((p) => `<p>${escapeHtml(p)}</p>`).join('');
+  let link = '';
+  if (CONFIG.REPO_URL) {
+    link =
+      `<p class="about-repo">` +
+      `<a href="${escapeHtml(CONFIG.REPO_URL)}" target="_blank" rel="noopener noreferrer">` +
+      `${escapeHtml(t.sourceCode)}</a></p>`;
+  }
+  body.innerHTML = paras + link;
   document.getElementById('about-modal').classList.remove('modal-hidden');
 }
 function closeAbout() {

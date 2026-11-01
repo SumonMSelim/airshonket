@@ -24,3 +24,4 @@ data/snapshots/
 # Node (for the web build, added later)
 node_modules/
 dist/
+docs/

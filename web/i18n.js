@@ -54,6 +54,7 @@ export const STRINGS = {
       'Data: live air readings from OpenAQ, brick kiln locations from OpenStreetMap, wind from Open-Meteo. Live air monitors are concentrated around Dhaka, so readings are strongest there. Kilns are shown for the whole country.',
       'The health advice is general public guidance based on standard AQI bands. It is not medical advice.',
     ],
+    sourceCode: 'Source code on GitHub',
     whatToDo: 'What to do',
     nearbySources: 'Nearby sources',
     near: 'Near',
@@ -129,7 +130,7 @@ export const STRINGS = {
   },
 
   bn: {
-    brand: 'এয়ারশনকেত',
+    brand: 'এয়ারশংকেত',
     tagline: 'স্বস্তিতে শ্বাস নিন। বাতাসের খবর জানুন।',
     setProfile: 'আপনি কে, জানান',
     locate: 'আমার অবস্থান খুঁজুন',
@@ -161,8 +162,9 @@ export const STRINGS = {
       'তথ্য: OpenAQ থেকে সরাসরি বাতাসের পরিমাপ, OpenStreetMap থেকে ইটভাটার অবস্থান, Open-Meteo থেকে বাতাস। সরাসরি বাতাস পরিমাপ মূলত ঢাকার আশেপাশে, তাই সেখানে তথ্য সবচেয়ে ভালো। ইটভাটা সারা দেশের দেখানো হয়েছে।',
       'স্বাস্থ্য পরামর্শ সাধারণ জনস্বাস্থ্য নির্দেশনা, কোনো চিকিৎসা পরামর্শ নয়।',
     ],
+    sourceCode: 'GitHub-এ সোর্স কোড',
     whatToDo: 'কী করবেন',
-    nearbySources: 'কাছের উৎস',
+    nearbySources: 'নিকটতম সূক্ষ্ম ধূলিকণার উৎস',
     near: 'কাছে',
     noReading: 'এখনও বাতাসের কোনো তথ্য আসেনি।',
     readingSubHere: 'PM2.5 {pm25} µg/m³, এই জায়গায়।',

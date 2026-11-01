@@ -6,8 +6,9 @@ A public web map of air quality across Bangladesh. It shows how bad the air is
 now, where the pollution comes from, and what each person should do about it
 today.
 
-Built for the AWS "Map It" weekend challenge. See the full plan in
-[`docs/SCOPE.md`](docs/SCOPE.md).
+Built for the AWS "Map It" weekend challenge.
+
+Live map: https://airshonket.mol.la/
 
 ## Data sources
 
@@ -15,6 +16,7 @@ Built for the AWS "Map It" weekend challenge. See the full plan in
   (`s3://openaq-data-archive`, no AWS account needed). Licensed by OpenAQ.
 - Pollution sources: brick kilns from OpenStreetMap, via the Overpass API.
   Licensed under ODbL. Attribution: © OpenStreetMap contributors.
+- Wind: Open-Meteo. Free, no key.
 
 ## Layout
 
@@ -24,24 +26,40 @@ pipeline/    python scripts and the scheduled ingest Lambda
   scripts/   one-time pulls (station list, OSM kilns)
   lambda/    scheduled ingest handler
 data/        small local cache of pulled data
-infra/       notes and IaC for AWS resources
-docs/        scope and design notes
+infra/       shell-script notes and IaC for AWS resources
+infra-cdk/   the AWS CDK app (primary IaC) and deploy.sh
 ```
 
 ## AWS services
 
-- Amazon S3: raw snapshots, Iceberg table, static datasets, pre-aggregated files.
-- AWS Lambda: scheduled ingest, Athena queries, writing the files the map reads.
-- Amazon EventBridge: triggers the ingest Lambda on a schedule.
-- Apache Iceberg on S3 + Amazon Athena: history and aggregation.
-- Amazon Location Service: base map tiles.
-- Amazon CloudFront: serves the static web app.
+- Amazon Location Service: v2 Standard base map tiles, via a tile-only API key.
+- Amazon S3: a private bucket for the datasets, the latest readings, and dated
+  history snapshots. The public OpenAQ archive on S3 is the open-data source.
+- AWS Lambda: scheduled ingest. Reads the OpenAQ public archive and writes the
+  small static files the map reads.
+- Amazon EventBridge: triggers the ingest Lambda every 30 minutes.
+- Amazon CloudFront: serves the static web app publicly, with Origin Access
+  Control so the bucket stays private. Custom domain over HTTPS (ACM).
 
-The front end never calls Athena directly. Lambda writes small static files to
-S3, and the map reads those through CloudFront. This keeps the site fast and the
-cost near zero.
+The front end never calls a backend at request time. Lambda writes small static
+files to S3, and the map reads those through CloudFront. History and aggregation
+can be run over the snapshots with Amazon Athena offline, never on the live
+request path. This keeps the site fast and the cost near zero.
+
+## Deploy
+
+```
+cd infra-cdk
+npm install
+npm run build
+./deploy.sh
+```
+
+`deploy.sh` runs `cdk deploy`, then fetches the Amazon Location key and writes
+it into `runtime-config.js` directly in the S3 bucket, so the map key never
+lives in source. See `infra-cdk/README.md` for details.
 
 ## Licence
 
-Code: MIT. See [`LICENSE`](LICENSE).
+Code: AGPL-3.0. See [`LICENSE`](LICENSE).
 Data: OpenAQ terms for air quality; ODbL for OpenStreetMap kilns.

@@ -9,9 +9,12 @@
 // app falls back to the open demo style so the map still renders locally.
 
 export const CONFIG = {
-  // Example once AWS is set up:
-  //   https://maps.geo.<region>.amazonaws.com/v2/styles/Standard/descriptor?key=<API_KEY>
-  LOCATION_STYLE_URL: null,
+  // Set at deploy time via runtime-config.js (which the CDK stack generates
+  // with the map key). Null in source so no key is ever committed. When unset,
+  // the app falls back to DEMO_STYLE_URL for local development.
+  LOCATION_STYLE_URL:
+    (typeof globalThis !== 'undefined' && globalThis.__AIRSHONKET_STYLE_URL__) ||
+    null,
 
   // Open fallback style for local development. CARTO Voyager has city names,
   // boundaries, roads and rivers, so the map reads properly before AWS is
@@ -28,6 +31,9 @@ export const CONFIG = {
   // Demo location for testing and the demo video, used when the user is not
   // physically in Bangladesh. Hazrat Shahjalal International Airport, Dhaka.
   DEMO_LOCATION: { name: 'Dhaka Airport', point: [90.3978, 23.8433] },
+
+  // Public source code repository (AGPL-3.0). Shown in the About panel.
+  REPO_URL: 'https://github.com/SumonMSelim/airshonket',
 
   // Map framing for Bangladesh.
   BD_CENTER: [90.4, 23.7], // lon, lat (near Dhaka)

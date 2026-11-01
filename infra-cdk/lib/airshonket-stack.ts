@@ -8,6 +8,7 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import * as location from 'aws-cdk-lib/aws-location';
+import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -52,6 +53,26 @@ export class AirshonketStack extends cdk.Stack {
 
     const projectRoot = findProjectRoot(__dirname);
 
+    // --------------------------------------------------------- custom domain
+    // Optional custom domain for CloudFront. Supplied via CDK context so the
+    // ARN and hostname stay out of source:
+    //   cdk deploy -c siteDomain=airshonket.mol.la \
+    //     -c siteCertArn=arn:aws:acm:us-east-1:...:certificate/...
+    // The ACM certificate must already be ISSUED in us-east-1 (CloudFront
+    // only accepts certs from that region). DNS lives in Cloudflare, so the
+    // cert is validated out-of-band before deploy and the public CNAME is
+    // added to Cloudflare after deploy.
+    const siteDomain = this.node.tryGetContext('siteDomain') as
+      | string
+      | undefined;
+    const siteCertArn = this.node.tryGetContext('siteCertArn') as
+      | string
+      | undefined;
+    const siteCertificate =
+      siteDomain && siteCertArn
+        ? acm.Certificate.fromCertificateArn(this, 'SiteCert', siteCertArn)
+        : undefined;
+
     // ----------------------------------------------------------------- bucket
     // Private bucket. Public reads happen only through CloudFront (OAC).
     const bucket = new s3.Bucket(this, 'DataBucket', {
@@ -67,6 +88,9 @@ export class AirshonketStack extends cdk.Stack {
     const distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
       comment: 'airshonket',
       defaultRootObject: 'index.html',
+      ...(siteDomain && siteCertificate
+        ? { domainNames: [siteDomain], certificate: siteCertificate }
+        : {}),
       defaultBehavior: {
         origin: origins.S3BucketOrigin.withOriginAccessControl(bucket),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
@@ -159,6 +183,17 @@ export class AirshonketStack extends cdk.Stack {
       value: `https://${distribution.distributionDomainName}/`,
       description: 'Public map URL (allow ~10 min on first deploy).',
     });
+    if (siteDomain) {
+      new cdk.CfnOutput(this, 'SiteCustomUrl', {
+        value: `https://${siteDomain}/`,
+        description: 'Custom domain URL (add a DNS-only CNAME in Cloudflare).',
+      });
+      new cdk.CfnOutput(this, 'CloudFrontDomain', {
+        value: distribution.distributionDomainName,
+        description:
+          'CNAME target for the custom domain record in Cloudflare.',
+      });
+    }
     new cdk.CfnOutput(this, 'DataBucketName', { value: bucket.bucketName });
     new cdk.CfnOutput(this, 'MapApiKeyName', {
       value: mapKey.keyName,

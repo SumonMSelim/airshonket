@@ -161,6 +161,18 @@ body {
   color: var(--text);
   margin: 0 0 10px;
 }
+.about-body .about-repo {
+  margin-top: 14px;
+}
+.about-body .about-repo a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+.about-body .about-repo a:hover,
+.about-body .about-repo a:focus {
+  text-decoration: underline;
+}
 
 /* Legend */
 .legend {
