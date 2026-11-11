@@ -1,0 +1,36 @@
+# Local AWS for the ingest Lambda tests. See emulator/README.md.
+services:
+  emulator:
+    build: ./emulator
+    ports:
+      - "127.0.0.1:9297:9297" # loopback only; never publish 9297:9297
+    volumes:
+      - emulator-home:/home/emulator/.aws/emulator
+    mem_limit: 2g
+
+  tests:
+    build: ./pipeline/tests
+    # Share the emulator's network namespace so https://127.0.0.1:9297 matches
+    # the emulator's self-signed certificate.
+    network_mode: "service:emulator"
+    depends_on:
+      - emulator
+    volumes:
+      - emulator-home:/home/emulator/.aws/emulator:ro
+      - ./pipeline:/app/pipeline:ro
+      - ./data:/app/data:ro
+    environment:
+      AWS_ENDPOINT_URL: https://127.0.0.1:9297
+      AWS_SHARED_CREDENTIALS_FILE: /home/emulator/.aws/emulator/9297/emulator_credentials
+      AWS_CONFIG_FILE: /home/emulator/.aws/emulator/9297/config
+      AWS_CA_BUNDLE: /home/emulator/.aws/emulator/9297/ca.pem
+      AWS_EC2_METADATA_DISABLED: "true"
+      AWS_DISABLE_HOST_PREFIX_INJECTION: "true"
+      AWS_REGION: us-east-1
+      AWS_DEFAULT_REGION: us-east-1
+      PYTHONPATH: /app/pipeline/lambda
+      PYTHONDONTWRITEBYTECODE: "1"
+      STATIONS_FILE: /app/data/bd_stations.json
+
+volumes:
+  emulator-home:
