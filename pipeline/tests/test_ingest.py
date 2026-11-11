@@ -80,7 +80,7 @@ def test_latest_geojson_has_only_stations_with_valid_readings(ingest, archive):
     handler, bucket = ingest
     result = handler.handler({}, None)
 
-    assert result["stations_total"] == len(archive) == 28
+    assert result["stations_total"] == len(archive) == 4
     assert result["readings_written"] == 2
     obj, body = read(bucket, "data/latest_pm25.geojson")
     assert obj["ContentType"] == "application/geo+json"

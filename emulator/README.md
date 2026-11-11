@@ -30,8 +30,9 @@ fidelity continuously, so read the release notes before bumping it.
 
 ## What the tests cover
 
-They import `handler.py` unchanged and seed the emulator with the real
-`data/bd_stations.json` plus synthetic OpenAQ day files: an out-of-range value,
+They import `handler.py` unchanged and seed the emulator with four stations
+from `pipeline/tests/fixtures/stations.json` (a subset of the generated,
+git-ignored `data/bd_stations.json`) plus synthetic OpenAQ day files: an out-of-range value,
 a non-PM2.5 row, a fallback to an older day, and a corrupt gzip. They check the
 GeoJSON and snapshot objects, including `ContentType` and `CacheControl`.
 
