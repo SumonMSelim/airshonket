@@ -25,9 +25,11 @@ web/         static MapLibre front end (S3 + CloudFront)
 pipeline/    python scripts and the scheduled ingest Lambda
   scripts/   one-time pulls (station list, OSM kilns)
   lambda/    scheduled ingest handler
+  tests/     handler tests that run against AWS Emulator
 data/        small local cache of pulled data
 infra/       shell-script notes and IaC for AWS resources
 infra-cdk/   the AWS CDK app (primary IaC) and deploy.sh
+emulator/    Dockerfile for AWS Emulator (used by compose.yml)
 ```
 
 ## AWS services
@@ -58,6 +60,16 @@ npm run build
 `deploy.sh` runs `cdk deploy`, then fetches the Amazon Location key and writes
 it into `runtime-config.js` directly in the S3 bucket, so the map key never
 lives in source. See `infra-cdk/README.md` for details.
+
+## Test locally
+
+```
+make emu-up     # start AWS Emulator in Docker
+make emu-test   # run the ingest handler tests against it
+make emu-down
+```
+
+No AWS account needed. See `emulator/README.md`.
 
 ## Licence
 
