@@ -1,0 +1,45 @@
+{
+  "source": "subset of data/bd_stations.json, kept small for tests",
+  "stations": [
+    {
+      "location_id": 22,
+      "name": "SPARTAN - Dhaka University",
+      "lat": 23.728,
+      "lon": 90.398,
+      "pm25_sensor_ids": [
+        41
+      ],
+      "provider": "Spartan"
+    },
+    {
+      "location_id": 2445,
+      "name": "US Diplomatic Post: Dhaka",
+      "lat": 23.797687,
+      "lon": 90.423698,
+      "pm25_sensor_ids": [
+        4680
+      ],
+      "provider": "StateAir Dhaka"
+    },
+    {
+      "location_id": 8415,
+      "name": "Dhaka",
+      "lat": 23.796374,
+      "lon": 90.424614,
+      "pm25_sensor_ids": [
+        24434
+      ],
+      "provider": "AirNow"
+    },
+    {
+      "location_id": 1285342,
+      "name": "SPARTAN - Dhaka University",
+      "lat": 23.7284,
+      "lon": 90.3982,
+      "pm25_sensor_ids": [
+        6566258
+      ],
+      "provider": "SPARTAN Network"
+    }
+  ]
+}

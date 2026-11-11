@@ -18,7 +18,6 @@ services:
     volumes:
       - emulator-home:/home/emulator/.aws/emulator:ro
       - ./pipeline:/app/pipeline:ro
-      - ./data:/app/data:ro
     environment:
       AWS_ENDPOINT_URL: https://127.0.0.1:9297
       AWS_SHARED_CREDENTIALS_FILE: /home/emulator/.aws/emulator/9297/emulator_credentials
@@ -30,7 +29,7 @@ services:
       AWS_DEFAULT_REGION: us-east-1
       PYTHONPATH: /app/pipeline/lambda
       PYTHONDONTWRITEBYTECODE: "1"
-      STATIONS_FILE: /app/data/bd_stations.json
+      STATIONS_FILE: /app/pipeline/tests/fixtures/stations.json
 
 volumes:
   emulator-home:
